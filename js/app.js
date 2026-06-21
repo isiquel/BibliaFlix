@@ -37,62 +37,86 @@ async function loadJson(path, fallback){
 
 
 
-// ===== Bíblia completa com seletor de versão =====
-// A versão Almeida antiga continua como reserva pelo GetBible.
-// NVI e ACF são carregadas pela API ABíbliaDigital, sem embutir texto protegido no projeto.
-// Observação: sem token, a ABíbliaDigital informa limite de 20 requisições por hora.
+
+// ===== Bíblia completa com seletor de versão estável =====
+// Fase 5: as versões principais agora vêm de arquivos JSON públicos no GitHub (damarals/biblias),
+// evitando o erro de limite da ABíbliaDigital. A Almeida antiga do GetBible fica como reserva.
 const BIBLE_VERSIONS = {
-  nvi: {
-    id: 'nvi',
-    label: 'NVI — ABíbliaDigital',
-    short: 'NVI',
-    source: 'abiblia',
-    code: 'nvi',
-    note: 'Linguagem mais atual. Depende da API ABíbliaDigital.'
+  jfaa: {
+    id: 'jfaa',
+    label: 'Almeida Atualizada — JFAA',
+    short: 'JFAA',
+    source: 'github',
+    code: 'JFAA',
+    note: 'Opção mais limpa para leitura: Almeida Atualizada carregada por arquivo JSON público.'
   },
   acf: {
     id: 'acf',
-    label: 'ACF — ABíbliaDigital',
+    label: 'Almeida Corrigida Fiel — ACF',
     short: 'ACF',
-    source: 'abiblia',
-    code: 'acf',
-    note: 'Almeida Corrigida Fiel. Depende da API ABíbliaDigital.'
+    source: 'github',
+    code: 'ACF',
+    note: 'Almeida Corrigida Fiel carregada por arquivo JSON público.'
   },
-  ra: {
-    id: 'ra',
-    label: 'RA — ABíbliaDigital',
-    short: 'RA',
-    source: 'abiblia',
-    code: 'ra',
-    note: 'Almeida Revista e Atualizada pela API ABíbliaDigital.'
+  ara: {
+    id: 'ara',
+    label: 'Almeida Revista e Atualizada — ARA',
+    short: 'ARA',
+    source: 'github',
+    code: 'ARA',
+    note: 'ARA carregada de fonte JSON pública. Verifique permissões antes de uso amplo.'
+  },
+  blivre: {
+    id: 'blivre',
+    label: 'Bíblia Livre — BLIVRE',
+    short: 'BLIVRE',
+    source: 'github',
+    code: 'BLIVRE',
+    note: 'Bíblia Livre, boa alternativa gratuita para leitura.'
+  },
+  tb: {
+    id: 'tb',
+    label: 'Tradução Brasileira — TB',
+    short: 'TB',
+    source: 'github',
+    code: 'TB',
+    note: 'Tradução Brasileira em domínio público segundo a fonte do pacote.'
+  },
+  nvi: {
+    id: 'nvi',
+    label: 'NVI — fonte pública',
+    short: 'NVI',
+    source: 'github',
+    code: 'NVI',
+    note: 'NVI em arquivo JSON público. Use com cuidado quanto a permissões/licença.'
   },
   almeida: {
     id: 'almeida',
-    label: 'Almeida — GetBible',
-    short: 'Almeida',
+    label: 'Almeida antiga — GetBible',
+    short: 'Almeida antiga',
     source: 'getbible',
     code: 'almeida',
-    note: 'Versão antiga, usada como reserva por ser livre e completa.'
+    note: 'Versão antiga e livre, usada como reserva quando outra fonte falhar.'
   }
 };
 
-const ABIBLIA_API = 'https://www.abibliadigital.com.br/api';
 const GETBIBLE_API = 'https://api.getbible.net/v2/almeida';
+const GITHUB_BIBLE_RAW = 'https://raw.githubusercontent.com/damarals/biblias/main/data/canonical';
 
-const ABIBLIA_ABBREV = {
-  genesis:'gn', exodo:'ex', levitico:'lv', numeros:'nm', deuteronomio:'dt', josue:'js', juizes:'jz', rute:'rt',
-  '1samuel':'1sm', '2samuel':'2sm', '1reis':'1rs', '2reis':'2rs', '1cronicas':'1cr', '2cronicas':'2cr',
-  esdras:'ed', neemias:'ne', ester:'et', jo:'job', salmos:'sl', proverbios:'pv', eclesiastes:'ec', canticos:'ct',
-  isaias:'is', jeremias:'jr', lamentacoes:'lm', ezequiel:'ez', daniel:'dn', oseias:'os', joel:'jl', amos:'am',
-  obadias:'ob', jonas:'jn', miqueias:'mq', naum:'na', habacuque:'hc', sofonias:'sf', ageu:'ag', zacarias:'zc', malaquias:'ml',
-  mateus:'mt', marcos:'mc', lucas:'lc', joao:'jo', atos:'at', romanos:'rm', '1corintios':'1co', '2corintios':'2co',
-  galatas:'gl', efesios:'ef', filipenses:'fp', colossenses:'cl', '1tessalonicenses':'1ts', '2tessalonicenses':'2ts',
-  '1timoteo':'1tm', '2timoteo':'2tm', tito:'tt', filemom:'fm', hebreus:'hb', tiago:'tg', '1pedro':'1pe', '2pedro':'2pe',
-  '1joao':'1jo', '2joao':'2jo', '3joao':'3jo', judas:'jd', apocalipse:'ap'
+const GITHUB_BOOK_CODES = {
+  genesis:'GEN', exodo:'EXO', levitico:'LEV', numeros:'NUM', deuteronomio:'DEU', josue:'JOS', juizes:'JDG', rute:'RUT',
+  '1samuel':'1SA', '2samuel':'2SA', '1reis':'1KI', '2reis':'2KI', '1cronicas':'1CH', '2cronicas':'2CH',
+  esdras:'EZR', neemias:'NEH', ester:'EST', jo:'JOB', salmos:'PSA', proverbios:'PRO', eclesiastes:'ECC', canticos:'SNG',
+  isaias:'ISA', jeremias:'JER', lamentacoes:'LAM', ezequiel:'EZK', daniel:'DAN', oseias:'HOS', joel:'JOL', amos:'AMO',
+  obadias:'OBA', jonas:'JON', miqueias:'MIC', naum:'NAM', habacuque:'HAB', sofonias:'ZEP', ageu:'HAG', zacarias:'ZEC', malaquias:'MAL',
+  mateus:'MAT', marcos:'MRK', lucas:'LUK', joao:'JHN', atos:'ACT', romanos:'ROM', '1corintios':'1CO', '2corintios':'2CO',
+  galatas:'GAL', efesios:'EPH', filipenses:'PHP', colossenses:'COL', '1tessalonicenses':'1TH', '2tessalonicenses':'2TH',
+  '1timoteo':'1TI', '2timoteo':'2TI', tito:'TIT', filemom:'PHM', hebreus:'HEB', tiago:'JAS', '1pedro':'1PE', '2pedro':'2PE',
+  '1joao':'1JN', '2joao':'2JN', '3joao':'3JN', judas:'JUD', apocalipse:'REV'
 };
 
-function currentBibleVersionId(){ return storage.get('bibleVersion', 'nvi'); }
-function currentBibleVersion(){ return BIBLE_VERSIONS[currentBibleVersionId()] || BIBLE_VERSIONS.nvi; }
+function currentBibleVersionId(){ return storage.get('bibleVersion', 'jfaa'); }
+function currentBibleVersion(){ return BIBLE_VERSIONS[currentBibleVersionId()] || BIBLE_VERSIONS.jfaa; }
 function currentBibleVersionLabel(){ return currentBibleVersion().label; }
 function apiToken(){ return storage.get('abibliaToken', ''); }
 
@@ -100,10 +124,10 @@ function getBookNumber(bookId){
   const idx = DATA.books.findIndex(b => b.id === bookId);
   return idx >= 0 ? idx + 1 : null;
 }
-function getBookAbbrev(bookId){ return ABIBLIA_ABBREV[bookId] || null; }
+function getGithubBookCode(bookId){ return GITHUB_BOOK_CODES[bookId] || null; }
 
-function cacheKeyChapter(bookId, chapter){ return `chapter_v2_${currentBibleVersionId()}_${bookId}_${chapter}`; }
-function cacheKeyBook(bookId){ return `book_cache_v2_${currentBibleVersionId()}_${bookId}`; }
+function cacheKeyChapter(bookId, chapter){ return `chapter_v5_${currentBibleVersionId()}_${bookId}_${chapter}`; }
+function cacheKeyBook(bookId){ return `book_cache_v5_${currentBibleVersionId()}_${bookId}`; }
 
 function stripHtml(txt=''){
   const div = document.createElement('div');
@@ -129,18 +153,17 @@ function normalizeChapterResponse(raw){
   }).filter(v => v.t);
 }
 
-async function fetchFromAbibliaDigital(bookId, chapter, version){
-  const abbrev = getBookAbbrev(bookId);
-  if(!abbrev) throw new Error('Abreviação do livro não encontrada para esta API.');
-  const url = `${ABIBLIA_API}/verses/${version.code}/${abbrev}/${chapter}`;
-  const headers = { 'Accept': 'application/json' };
-  if(apiToken()) headers.Authorization = 'Bearer ' + apiToken();
-  const res = await fetch(url, { headers });
-  if(!res.ok) throw new Error('A versão escolhida não carregou agora. Pode ser limite da API ou instabilidade.');
+async function fetchFromGithubBible(bookId, chapter, version){
+  const bookCode = getGithubBookCode(bookId);
+  if(!bookCode) throw new Error('Código do livro não encontrado para esta fonte.');
+  const url = `${GITHUB_BIBLE_RAW}/${version.code}/${bookCode}.json`;
+  const res = await fetch(url, { cache: 'force-cache' });
+  if(!res.ok) throw new Error('Não foi possível carregar esta versão agora.');
   const raw = await res.json();
-  const verses = normalizeChapterResponse(raw);
+  const chapterObj = (raw.chapters || []).find(c => Number(c.number) === Number(chapter));
+  const verses = normalizeChapterResponse(chapterObj || {});
   if(!verses.length) throw new Error('O capítulo veio sem versículos reconhecidos.');
-  return { version: version.label, source: url, title: raw?.book?.name || '', verses, savedAt: new Date().toISOString() };
+  return { version: version.label, source: url, title: raw.name || '', verses, savedAt: new Date().toISOString() };
 }
 
 async function fetchFromGetBible(bookId, chapter){
@@ -162,8 +185,8 @@ async function fetchBibleChapter(bookId, chapter, opts = {}){
   const selected = currentBibleVersion();
   let payload;
 
-  if(selected.source === 'abiblia') {
-    payload = await fetchFromAbibliaDigital(bookId, chapter, selected);
+  if(selected.source === 'github') {
+    payload = await fetchFromGithubBible(bookId, chapter, selected);
   } else {
     payload = await fetchFromGetBible(bookId, chapter);
   }
@@ -185,9 +208,6 @@ async function fetchBibleChapter(bookId, chapter, opts = {}){
 async function downloadBookOffline(bookId){
   const b = DATA.books.find(x=>x.id===bookId); if(!b) return;
   const v = currentBibleVersion();
-  if(v.source === 'abiblia'){
-    toast('Esta API grátis tem limite. Baixe aos poucos ou use Almeida para baixar livro inteiro.');
-  }
   toast(`Baixando ${b.name} em ${v.short}...`);
   const failed = [];
   for(let ch=1; ch<=Number(b.chapters); ch++){
@@ -256,11 +276,10 @@ function bindEvents(){
 }
 
 function setApiToken(){
-  const atual = apiToken();
-  const token = prompt('Cole aqui seu token grátis da ABíbliaDigital para aumentar o limite da API. Deixe vazio para remover.', atual);
-  if(token === null) return;
-  if(token.trim()) { storage.set('abibliaToken', token.trim()); toast('Token salvo neste aparelho.'); }
-  else { storage.remove('abibliaToken'); toast('Token removido.'); }
+  const ok = confirm('Na Fase 5 as versões principais não dependem mais de token. Deseja limpar o cache bíblico salvo neste aparelho para forçar recarregar a versão escolhida?');
+  if(!ok) return;
+  Object.keys(localStorage).forEach(k => { if(k.startsWith('bibliaflix_chapter_') || k.startsWith('bibliaflix_book_cache_')) localStorage.removeItem(k); });
+  toast('Cache bíblico limpo. Abra o capítulo novamente.');
 }
 function reloadCurrentChapter(){
   const p = state.currentReader;
