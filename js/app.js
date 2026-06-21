@@ -35,19 +35,65 @@ async function loadJson(path, fallback){
 
 
 
-// ===== Bíblia completa via GetBible API =====
-// Usa a tradução "almeida" disponível no GetBible. O texto não fica todo dentro do index;
-// cada capítulo é carregado quando a pessoa abre, e fica em cache no aparelho.
-const BIBLE_API = 'https://api.getbible.net/v2/almeida';
-const BIBLE_VERSION_LABEL = 'Almeida — GetBible';
+
+// ===== Bíblia completa com seletor de versão =====
+// A versão Almeida antiga continua como reserva pelo GetBible.
+// NVI e ACF são carregadas pela API ABíbliaDigital, sem embutir texto protegido no projeto.
+// Observação: sem token, a ABíbliaDigital informa limite de 20 requisições por hora.
+const BIBLE_VERSIONS = {
+  nvi: {
+    id: 'nvi',
+    label: 'NVI — ABíbliaDigital',
+    short: 'NVI',
+    source: 'abiblia',
+    code: 'nvi',
+    note: 'Linguagem mais atual. Depende da API ABíbliaDigital.'
+  },
+  acf: {
+    id: 'acf',
+    label: 'ACF — ABíbliaDigital',
+    short: 'ACF',
+    source: 'abiblia',
+    code: 'acf',
+    note: 'Almeida Corrigida Fiel. Depende da API ABíbliaDigital.'
+  },
+  almeida: {
+    id: 'almeida',
+    label: 'Almeida — GetBible',
+    short: 'Almeida',
+    source: 'getbible',
+    code: 'almeida',
+    note: 'Versão antiga, usada como reserva por ser livre e completa.'
+  }
+};
+
+const ABIBLIA_API = 'https://www.abibliadigital.com.br/api';
+const GETBIBLE_API = 'https://api.getbible.net/v2/almeida';
+
+const ABIBLIA_ABBREV = {
+  genesis:'gn', exodo:'ex', levitico:'lv', numeros:'nm', deuteronomio:'dt', josue:'js', juizes:'jz', rute:'rt',
+  '1samuel':'1sm', '2samuel':'2sm', '1reis':'1rs', '2reis':'2rs', '1cronicas':'1cr', '2cronicas':'2cr',
+  esdras:'ed', neemias:'ne', ester:'et', jo:'job', salmos:'sl', proverbios:'pv', eclesiastes:'ec', canticos:'ct',
+  isaias:'is', jeremias:'jr', lamentacoes:'lm', ezequiel:'ez', daniel:'dn', oseias:'os', joel:'jl', amos:'am',
+  obadias:'ob', jonas:'jn', miqueias:'mq', naum:'na', habacuque:'hc', sofonias:'sf', ageu:'ag', zacarias:'zc', malaquias:'ml',
+  mateus:'mt', marcos:'mc', lucas:'lc', joao:'jo', atos:'at', romanos:'rm', '1corintios':'1co', '2corintios':'2co',
+  galatas:'gl', efesios:'ef', filipenses:'fp', colossenses:'cl', '1tessalonicenses':'1ts', '2tessalonicenses':'2ts',
+  '1timoteo':'1tm', '2timoteo':'2tm', tito:'tt', filemom:'fm', hebreus:'hb', tiago:'tg', '1pedro':'1pe', '2pedro':'2pe',
+  '1joao':'1jo', '2joao':'2jo', '3joao':'3jo', judas:'jd', apocalipse:'ap'
+};
+
+function currentBibleVersionId(){ return storage.get('bibleVersion', 'nvi'); }
+function currentBibleVersion(){ return BIBLE_VERSIONS[currentBibleVersionId()] || BIBLE_VERSIONS.nvi; }
+function currentBibleVersionLabel(){ return currentBibleVersion().label; }
 
 function getBookNumber(bookId){
   const idx = DATA.books.findIndex(b => b.id === bookId);
   return idx >= 0 ? idx + 1 : null;
 }
+function getBookAbbrev(bookId){ return ABIBLIA_ABBREV[bookId] || null; }
 
-function cacheKeyChapter(bookId, chapter){ return `chapter_${bookId}_${chapter}`; }
-function cacheKeyBook(bookId){ return `book_cache_${bookId}`; }
+function cacheKeyChapter(bookId, chapter){ return `chapter_${currentBibleVersionId()}_${bookId}_${chapter}`; }
+function cacheKeyBook(bookId){ return `book_cache_${currentBibleVersionId()}_${bookId}`; }
 
 function stripHtml(txt=''){
   const div = document.createElement('div');
@@ -67,33 +113,54 @@ function normalizeChapterResponse(raw){
   return arr.map((v, i) => {
     if(typeof v === 'string') return { n: i + 1, t: stripHtml(v) };
     return {
-      n: Number(v.verse || v.verse_nr || v.number || v.nr || v.v || i + 1),
+      n: Number(v.number || v.verse || v.verse_nr || v.nr || v.v || i + 1),
       t: stripHtml(v.text || v.verse_text || v.scripture || v.t || v.content || '')
     };
   }).filter(v => v.t);
+}
+
+async function fetchFromAbibliaDigital(bookId, chapter, version){
+  const abbrev = getBookAbbrev(bookId);
+  if(!abbrev) throw new Error('Abreviação do livro não encontrada para esta API.');
+  const url = `${ABIBLIA_API}/verses/${version.code}/${abbrev}/${chapter}`;
+  const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+  if(!res.ok) throw new Error('A versão escolhida não carregou agora. Pode ser limite da API ou instabilidade.');
+  const raw = await res.json();
+  const verses = normalizeChapterResponse(raw);
+  if(!verses.length) throw new Error('O capítulo veio sem versículos reconhecidos.');
+  return { version: version.label, source: url, title: raw?.book?.name || '', verses, savedAt: new Date().toISOString() };
+}
+
+async function fetchFromGetBible(bookId, chapter){
+  const bookNumber = getBookNumber(bookId);
+  if(!bookNumber) throw new Error('Livro não encontrado.');
+  const url = `${GETBIBLE_API}/${bookNumber}/${chapter}.json`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Não foi possível carregar o capítulo da Bíblia agora.');
+  const raw = await res.json();
+  const verses = normalizeChapterResponse(raw);
+  if(!verses.length) throw new Error('O capítulo veio sem versículos reconhecidos.');
+  return { version: BIBLE_VERSIONS.almeida.label, source: url, title: raw.name || raw.chapter_name || '', verses, savedAt: new Date().toISOString() };
 }
 
 async function fetchBibleChapter(bookId, chapter){
   const cached = storage.get(cacheKeyChapter(bookId, chapter), null);
   if(cached?.verses?.length) return cached;
 
-  const bookNumber = getBookNumber(bookId);
-  if(!bookNumber) throw new Error('Livro não encontrado.');
+  const selected = currentBibleVersion();
+  let payload;
 
-  const url = `${BIBLE_API}/${bookNumber}/${chapter}.json`;
-  const res = await fetch(url);
-  if(!res.ok) throw new Error('Não foi possível carregar o capítulo da Bíblia agora.');
-  const raw = await res.json();
-  const verses = normalizeChapterResponse(raw);
-  if(!verses.length) throw new Error('O capítulo veio sem versículos reconhecidos.');
+  try {
+    if(selected.source === 'abiblia') payload = await fetchFromAbibliaDigital(bookId, chapter, selected);
+    else payload = await fetchFromGetBible(bookId, chapter);
+  } catch (err) {
+    console.warn('Falha na versão selecionada. Tentando Almeida como reserva.', err);
+    if(selected.id === 'almeida') throw err;
+    payload = await fetchFromGetBible(bookId, chapter);
+    payload.version = `${payload.version} — reserva automática`;
+    payload.warning = `A versão ${selected.short} não carregou agora. O app abriu a Almeida como reserva.`;
+  }
 
-  const payload = {
-    version: BIBLE_VERSION_LABEL,
-    source: url,
-    title: raw.name || raw.chapter_name || '',
-    verses,
-    savedAt: new Date().toISOString()
-  };
   storage.set(cacheKeyChapter(bookId, chapter), payload);
 
   let cachedChapters = storage.get(cacheKeyBook(bookId), []);
@@ -108,14 +175,18 @@ async function fetchBibleChapter(bookId, chapter){
 
 async function downloadBookOffline(bookId){
   const b = DATA.books.find(x=>x.id===bookId); if(!b) return;
-  toast(`Baixando ${b.name}...`);
+  const v = currentBibleVersion();
+  if(v.source === 'abiblia'){
+    toast('Esta API grátis tem limite. Baixe aos poucos ou use Almeida para baixar livro inteiro.');
+  }
+  toast(`Baixando ${b.name} em ${v.short}...`);
   const failed = [];
   for(let ch=1; ch<=Number(b.chapters); ch++){
     try { await fetchBibleChapter(bookId, ch); }
     catch(e){ failed.push(ch); console.warn(e); }
   }
   if(failed.length){ toast(`Alguns capítulos falharam: ${failed.slice(0,5).join(', ')}${failed.length>5?'...':''}`); }
-  else { toast(`${b.name} completo salvo para leitura offline.`); }
+  else { toast(`${b.name} salvo para leitura offline em ${v.short}.`); }
   openBook(bookId);
 }
 window.downloadBookOffline = downloadBookOffline;
@@ -137,11 +208,18 @@ function applySettings(){
   const theme = storage.get('theme', 'dark');
   if(theme === 'light') document.body.classList.add('light');
   $('themeBtn').textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+  const vs = $('versionSelect');
+  if(vs) vs.value = currentBibleVersionId();
   document.documentElement.style.setProperty('--readerFont', storage.get('font', 19) + 'px');
 }
 
 function bindEvents(){
   document.querySelectorAll('[data-go]').forEach(btn => btn.addEventListener('click', () => go(btn.dataset.go)));
+  $('versionSelect').addEventListener('change', e => {
+    storage.set('bibleVersion', e.target.value);
+    toast('Versão bíblica alterada para ' + currentBibleVersion().short);
+    if(state.view === 'books') renderBooks();
+  });
   $('themeBtn').addEventListener('click', () => {
     document.body.classList.toggle('light');
     storage.set('theme', document.body.classList.contains('light') ? 'light' : 'dark');
@@ -194,7 +272,7 @@ function renderHome(){
       <div class="heroContent">
         <span class="badge">📖 Plataforma bíblica gratuita</span>
         <h1>Uma Netflix da Bíblia, organizada para ler, ouvir e estudar.</h1>
-        <p>Livros, histórias, personagens, favoritos, anotações, voz narrada pelo celular e progresso salvo no aparelho.</p>
+        <p>Livros, histórias, personagens, favoritos, anotações, voz narrada pelo celular e progresso salvo no aparelho. Agora com seletor de versão bíblica: NVI, ACF e Almeida.</p>
         <div class="btnRow">
           <button class="pillBtn primary" onclick="go('books')">▶ Começar pelos livros</button>
           <button class="pillBtn" onclick="go('stories')">✨ Histórias bíblicas</button>
@@ -254,25 +332,25 @@ window.openBook = function(id){
   const b = DATA.books.find(x=>x.id===id); if(!b) return;
   const cached = cachedChapterList(id);
   const buttons = Array.from({length:b.chapters},(_,i)=>i+1).map(n => `<button class="chapterBtn ${cached.includes(n)?'hasText':''}" onclick="openChapter('${id}',${n})">Cap. ${n}${cached.includes(n)?' ✓':''}</button>`).join('');
-  main.innerHTML = `<section class="bookScreen"><aside class="sidePoster" style="background-image:url('${cover(b.cover)}')"></aside><div class="details"><span class="badge">${b.testament}</span><h1 class="detailTitle">${b.name}</h1><div class="infoPanel"><strong>Tema:</strong> ${esc(b.theme)}<br><strong>Capítulos:</strong> ${b.chapters}<br><strong>Texto bíblico:</strong> livro completo disponível capítulo por capítulo na versão ${BIBLE_VERSION_LABEL}.<br><strong>Offline:</strong> ${cached.length} capítulo(s) já salvo(s) neste aparelho.</div><div class="btnRow" style="margin-bottom:18px"><button class="pillBtn primary" onclick="openChapter('${id}',1)">▶ Ler do capítulo 1</button><button class="pillBtn" onclick="downloadBookOffline('${id}')">⬇ Baixar livro offline</button><button class="pillBtn" onclick="toggleFav('book','${id}')">⭐ Salvar livro</button><button class="pillBtn" onclick="go('books')">← Voltar aos livros</button></div><h2>Capítulos</h2><div class="chapters">${buttons}</div><p class="sourceNote">Ao abrir um capítulo pela primeira vez, o app busca o texto completo online e salva no aparelho. Depois de salvo, ele abre mais rápido.</p></div></section>`;
+  main.innerHTML = `<section class="bookScreen"><aside class="sidePoster" style="background-image:url('${cover(b.cover)}')"></aside><div class="details"><span class="badge">${b.testament}</span><h1 class="detailTitle">${b.name}</h1><div class="infoPanel"><strong>Tema:</strong> ${esc(b.theme)}<br><strong>Capítulos:</strong> ${b.chapters}<br><strong>Texto bíblico:</strong> livro completo disponível capítulo por capítulo na versão <strong>${currentBibleVersionLabel()}</strong>.<br><strong>Offline:</strong> ${cached.length} capítulo(s) já salvo(s) neste aparelho nesta versão.<br><strong>Observação:</strong> ${esc(currentBibleVersion().note)}</div><div class="btnRow" style="margin-bottom:18px"><button class="pillBtn primary" onclick="openChapter('${id}',1)">▶ Ler do capítulo 1</button><button class="pillBtn" onclick="downloadBookOffline('${id}')">⬇ Baixar livro offline</button><button class="pillBtn" onclick="toggleFav('book','${id}')">⭐ Salvar livro</button><button class="pillBtn" onclick="go('books')">← Voltar aos livros</button></div><h2>Capítulos</h2><div class="chapters">${buttons}</div><p class="sourceNote">Ao abrir um capítulo pela primeira vez, o app busca o texto completo online e salva no aparelho. Depois de salvo, ele abre mais rápido.</p></div></section>`;
 };
 
 window.openChapter = async function(bookId, chapter){
   const b = DATA.books.find(x=>x.id===bookId); if(!b) return;
   const cached = storage.get(cacheKeyChapter(bookId, chapter), null);
-  openReader({type:'chapter', id:`${bookId}-${chapter}`, title:`${b.name} ${chapter}`, sub: cached ? 'Abrindo capítulo salvo...' : 'Carregando texto bíblico completo...', cover:b.cover, badge:'Capítulo', paragraphs:['Aguarde um instante. O app está carregando o capítulo completo.']});
+  openReader({type:'chapter', id:`${bookId}-${chapter}`, title:`${b.name} ${chapter}`, sub: cached ? 'Abrindo capítulo salvo...' : `Carregando texto bíblico completo em ${currentBibleVersion().short}...`, cover:b.cover, badge:'Capítulo', paragraphs:['Aguarde um instante. O app está carregando o capítulo completo.']});
   try {
     const chapterData = await fetchBibleChapter(bookId, chapter);
     openReader({
       type:'chapter',
       id:`${bookId}-${chapter}`,
       title:`${b.name} ${chapter}`,
-      sub:`${BIBLE_VERSION_LABEL} • ${chapterData.verses.length} versículo(s)`,
+      sub:`${chapterData.version} • ${chapterData.verses.length} versículo(s)`,
       cover:b.cover,
       badge:'Capítulo completo',
       verses:chapterData.verses,
-      paragraphs:[`Fonte: ${BIBLE_VERSION_LABEL}. Capítulo carregado completo e salvo em cache neste aparelho.`],
-      progress:{type:'chapter',bookId,chapter,title:`${b.name} ${chapter}`,sub:`${BIBLE_VERSION_LABEL}`,cover:b.cover}
+      paragraphs:[chapterData.warning || `Fonte: ${chapterData.version}. Capítulo carregado completo e salvo em cache neste aparelho.`],
+      progress:{type:'chapter',bookId,chapter,title:`${b.name} ${chapter}`,sub:`${chapterData.version}`,cover:b.cover}
     });
   } catch (err) {
     console.error(err);
