@@ -1,0 +1,17 @@
+{
+  "book": "Salmos",
+  "chapters": [
+    {
+      "number": 23,
+      "title": "O Senhor é o meu pastor",
+      "verses": [
+        {"n":1,"t":"O Senhor é o meu pastor; nada me faltará."},
+        {"n":2,"t":"Ele me faz repousar em pastos verdes e me conduz a águas tranquilas."},
+        {"n":3,"t":"Refrigera a minha alma e guia-me pelas veredas da justiça por amor do seu nome."},
+        {"n":4,"t":"Ainda que eu atravesse o vale da sombra da morte, não temerei mal algum, porque Tu estás comigo."},
+        {"n":5,"t":"A tua bondade e misericórdia me seguirão todos os dias da minha vida."}
+      ],
+      "paragraphs": ["Resumo pastoral: o salmo apresenta Deus como Pastor presente, cuidadoso, provedor e fiel mesmo nos vales."]
+    }
+  ]
+}

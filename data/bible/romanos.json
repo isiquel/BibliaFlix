@@ -1,0 +1,17 @@
+{
+  "book": "Romanos",
+  "chapters": [
+    {
+      "number": 8,
+      "title": "Vida no Espírito",
+      "verses": [
+        {"n":1,"t":"Agora nenhuma condenação há para os que estão em Cristo Jesus."},
+        {"n":2,"t":"A lei do Espírito de vida, em Cristo Jesus, livra da lei do pecado e da morte."},
+        {"n":3,"t":"Os que vivem segundo o Espírito aprendem a desejar as coisas do Espírito."},
+        {"n":4,"t":"O Espírito testifica que pertencemos a Deus e sustenta nossa esperança."},
+        {"n":5,"t":"Em todas as coisas, Deus trabalha em favor daqueles que o amam e são chamados segundo seu propósito."}
+      ],
+      "paragraphs": ["Resumo pastoral: Romanos 8 apresenta segurança, adoção, esperança e vitória em Cristo."]
+    }
+  ]
+}

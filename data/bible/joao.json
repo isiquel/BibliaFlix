@@ -1,0 +1,28 @@
+{
+  "book": "João",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "O Verbo eterno",
+      "verses": [
+        {"n":1,"t":"No princípio era o Verbo, e o Verbo estava com Deus, e o Verbo era Deus."},
+        {"n":2,"t":"Ele estava no princípio com Deus."},
+        {"n":3,"t":"Todas as coisas foram feitas por Ele, e sem Ele nada do que foi feito se fez."},
+        {"n":4,"t":"Nele estava a vida, e a vida era a luz dos homens."},
+        {"n":5,"t":"A luz resplandece nas trevas, e as trevas não prevaleceram contra ela."}
+      ],
+      "paragraphs": ["Resumo pastoral: João apresenta Cristo como o Verbo eterno, fonte da vida, luz verdadeira e revelação de Deus."]
+    },
+    {
+      "number": 3,
+      "title": "O novo nascimento",
+      "verses": [
+        {"n":1,"t":"Nicodemos procurou Jesus de noite, desejando compreender os sinais e o Reino de Deus."},
+        {"n":2,"t":"Jesus ensinou que ninguém pode ver o Reino de Deus se não nascer de novo."},
+        {"n":3,"t":"O novo nascimento aponta para uma obra espiritual, não apenas mudança externa."},
+        {"n":4,"t":"Deus amou o mundo de tal maneira que enviou seu Filho para trazer vida eterna aos que creem."}
+      ],
+      "paragraphs": ["Resumo pastoral: João 3 mostra que religião sem novo nascimento não basta; é preciso vida gerada por Deus."]
+    }
+  ]
+}

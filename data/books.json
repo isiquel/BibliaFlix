@@ -1,0 +1,596 @@
+[
+  {
+    "id": "genesis",
+    "name": "Gênesis",
+    "testament": "Antigo Testamento",
+    "chapters": 50,
+    "theme": "Começos",
+    "icon": "🌍",
+    "cover": "assets/covers/genesis.svg"
+  },
+  {
+    "id": "exodo",
+    "name": "Êxodo",
+    "testament": "Antigo Testamento",
+    "chapters": 40,
+    "theme": "Libertação",
+    "icon": "🔥",
+    "cover": "assets/covers/exodo.svg"
+  },
+  {
+    "id": "levitico",
+    "name": "Levítico",
+    "testament": "Antigo Testamento",
+    "chapters": 27,
+    "theme": "Santidade",
+    "icon": "🕊️",
+    "cover": "assets/covers/levitico.svg"
+  },
+  {
+    "id": "numeros",
+    "name": "Números",
+    "testament": "Antigo Testamento",
+    "chapters": 36,
+    "theme": "Jornada no deserto",
+    "icon": "🏜️",
+    "cover": "assets/covers/numeros.svg"
+  },
+  {
+    "id": "deuteronomio",
+    "name": "Deuteronômio",
+    "testament": "Antigo Testamento",
+    "chapters": 34,
+    "theme": "Aliança renovada",
+    "icon": "📜",
+    "cover": "assets/covers/deuteronomio.svg"
+  },
+  {
+    "id": "josue",
+    "name": "Josué",
+    "testament": "Antigo Testamento",
+    "chapters": 24,
+    "theme": "Conquista",
+    "icon": "⚔️",
+    "cover": "assets/covers/josue.svg"
+  },
+  {
+    "id": "juizes",
+    "name": "Juízes",
+    "testament": "Antigo Testamento",
+    "chapters": 21,
+    "theme": "Ciclos de queda e livramento",
+    "icon": "⚖️",
+    "cover": "assets/covers/juizes.svg"
+  },
+  {
+    "id": "rute",
+    "name": "Rute",
+    "testament": "Antigo Testamento",
+    "chapters": 4,
+    "theme": "Redenção",
+    "icon": "🌾",
+    "cover": "assets/covers/rute.svg"
+  },
+  {
+    "id": "1samuel",
+    "name": "1 Samuel",
+    "testament": "Antigo Testamento",
+    "chapters": 31,
+    "theme": "Reino e chamado",
+    "icon": "👑",
+    "cover": "assets/covers/1samuel.svg"
+  },
+  {
+    "id": "2samuel",
+    "name": "2 Samuel",
+    "testament": "Antigo Testamento",
+    "chapters": 24,
+    "theme": "Davi e o reino",
+    "icon": "🏰",
+    "cover": "assets/covers/2samuel.svg"
+  },
+  {
+    "id": "1reis",
+    "name": "1 Reis",
+    "testament": "Antigo Testamento",
+    "chapters": 22,
+    "theme": "Reis e profetas",
+    "icon": "🏛️",
+    "cover": "assets/covers/1reis.svg"
+  },
+  {
+    "id": "2reis",
+    "name": "2 Reis",
+    "testament": "Antigo Testamento",
+    "chapters": 25,
+    "theme": "Queda e juízo",
+    "icon": "💧",
+    "cover": "assets/covers/2reis.svg"
+  },
+  {
+    "id": "1cronicas",
+    "name": "1 Crônicas",
+    "testament": "Antigo Testamento",
+    "chapters": 29,
+    "theme": "Memória do povo",
+    "icon": "📖",
+    "cover": "assets/covers/1cronicas.svg"
+  },
+  {
+    "id": "2cronicas",
+    "name": "2 Crônicas",
+    "testament": "Antigo Testamento",
+    "chapters": 36,
+    "theme": "Templo e reino",
+    "icon": "⛪",
+    "cover": "assets/covers/2cronicas.svg"
+  },
+  {
+    "id": "esdras",
+    "name": "Esdras",
+    "testament": "Antigo Testamento",
+    "chapters": 10,
+    "theme": "Restauração",
+    "icon": "🧱",
+    "cover": "assets/covers/esdras.svg"
+  },
+  {
+    "id": "neemias",
+    "name": "Neemias",
+    "testament": "Antigo Testamento",
+    "chapters": 13,
+    "theme": "Reconstrução",
+    "icon": "🧰",
+    "cover": "assets/covers/neemias.svg"
+  },
+  {
+    "id": "ester",
+    "name": "Ester",
+    "testament": "Antigo Testamento",
+    "chapters": 10,
+    "theme": "Providência",
+    "icon": "👑",
+    "cover": "assets/covers/ester.svg"
+  },
+  {
+    "id": "jo",
+    "name": "Jó",
+    "testament": "Antigo Testamento",
+    "chapters": 42,
+    "theme": "Sofrimento e fé",
+    "icon": "🌪️",
+    "cover": "assets/covers/jo.svg"
+  },
+  {
+    "id": "salmos",
+    "name": "Salmos",
+    "testament": "Antigo Testamento",
+    "chapters": 150,
+    "theme": "Adoração",
+    "icon": "🎵",
+    "cover": "assets/covers/salmos.svg"
+  },
+  {
+    "id": "proverbios",
+    "name": "Provérbios",
+    "testament": "Antigo Testamento",
+    "chapters": 31,
+    "theme": "Sabedoria",
+    "icon": "💡",
+    "cover": "assets/covers/proverbios.svg"
+  },
+  {
+    "id": "eclesiastes",
+    "name": "Eclesiastes",
+    "testament": "Antigo Testamento",
+    "chapters": 12,
+    "theme": "Sentido da vida",
+    "icon": "⌛",
+    "cover": "assets/covers/eclesiastes.svg"
+  },
+  {
+    "id": "canticos",
+    "name": "Cânticos",
+    "testament": "Antigo Testamento",
+    "chapters": 8,
+    "theme": "Amor e aliança",
+    "icon": "🌹",
+    "cover": "assets/covers/canticos.svg"
+  },
+  {
+    "id": "isaias",
+    "name": "Isaías",
+    "testament": "Antigo Testamento",
+    "chapters": 66,
+    "theme": "Salvação e Messias",
+    "icon": "🔥",
+    "cover": "assets/covers/isaias.svg"
+  },
+  {
+    "id": "jeremias",
+    "name": "Jeremias",
+    "testament": "Antigo Testamento",
+    "chapters": 52,
+    "theme": "Chamado e lágrimas",
+    "icon": "😭",
+    "cover": "assets/covers/jeremias.svg"
+  },
+  {
+    "id": "lamentacoes",
+    "name": "Lamentações",
+    "testament": "Antigo Testamento",
+    "chapters": 5,
+    "theme": "Lamento e esperança",
+    "icon": "🕯️",
+    "cover": "assets/covers/lamentacoes.svg"
+  },
+  {
+    "id": "ezequiel",
+    "name": "Ezequiel",
+    "testament": "Antigo Testamento",
+    "chapters": 48,
+    "theme": "Glória de Deus",
+    "icon": "🌈",
+    "cover": "assets/covers/ezequiel.svg"
+  },
+  {
+    "id": "daniel",
+    "name": "Daniel",
+    "testament": "Antigo Testamento",
+    "chapters": 12,
+    "theme": "Fidelidade no exílio",
+    "icon": "🦁",
+    "cover": "assets/covers/daniel.svg"
+  },
+  {
+    "id": "oseias",
+    "name": "Oséias",
+    "testament": "Antigo Testamento",
+    "chapters": 14,
+    "theme": "Amor fiel",
+    "icon": "❤️",
+    "cover": "assets/covers/oseias.svg"
+  },
+  {
+    "id": "joel",
+    "name": "Joel",
+    "testament": "Antigo Testamento",
+    "chapters": 3,
+    "theme": "Derramamento do Espírito",
+    "icon": "🌧️",
+    "cover": "assets/covers/joel.svg"
+  },
+  {
+    "id": "amos",
+    "name": "Amós",
+    "testament": "Antigo Testamento",
+    "chapters": 9,
+    "theme": "Justiça",
+    "icon": "⚖️",
+    "cover": "assets/covers/amos.svg"
+  },
+  {
+    "id": "obadias",
+    "name": "Obadias",
+    "testament": "Antigo Testamento",
+    "chapters": 1,
+    "theme": "Soberania",
+    "icon": "⛰️",
+    "cover": "assets/covers/obadias.svg"
+  },
+  {
+    "id": "jonas",
+    "name": "Jonas",
+    "testament": "Antigo Testamento",
+    "chapters": 4,
+    "theme": "Misericórdia",
+    "icon": "🐋",
+    "cover": "assets/covers/jonas.svg"
+  },
+  {
+    "id": "miqueias",
+    "name": "Miquéias",
+    "testament": "Antigo Testamento",
+    "chapters": 7,
+    "theme": "Justiça e humildade",
+    "icon": "🕊️",
+    "cover": "assets/covers/miqueias.svg"
+  },
+  {
+    "id": "naum",
+    "name": "Naum",
+    "testament": "Antigo Testamento",
+    "chapters": 3,
+    "theme": "Juízo",
+    "icon": "⚡",
+    "cover": "assets/covers/naum.svg"
+  },
+  {
+    "id": "habacuque",
+    "name": "Habacuque",
+    "testament": "Antigo Testamento",
+    "chapters": 3,
+    "theme": "Fé em meio à crise",
+    "icon": "🙏",
+    "cover": "assets/covers/habacuque.svg"
+  },
+  {
+    "id": "sofonias",
+    "name": "Sofonias",
+    "testament": "Antigo Testamento",
+    "chapters": 3,
+    "theme": "Dia do Senhor",
+    "icon": "🌅",
+    "cover": "assets/covers/sofonias.svg"
+  },
+  {
+    "id": "ageu",
+    "name": "Ageu",
+    "testament": "Antigo Testamento",
+    "chapters": 2,
+    "theme": "Prioridades",
+    "icon": "🏗️",
+    "cover": "assets/covers/ageu.svg"
+  },
+  {
+    "id": "zacarias",
+    "name": "Zacarias",
+    "testament": "Antigo Testamento",
+    "chapters": 14,
+    "theme": "Esperança messiânica",
+    "icon": "🌿",
+    "cover": "assets/covers/zacarias.svg"
+  },
+  {
+    "id": "malaquias",
+    "name": "Malaquias",
+    "testament": "Antigo Testamento",
+    "chapters": 4,
+    "theme": "Fidelidade",
+    "icon": "🔥",
+    "cover": "assets/covers/malaquias.svg"
+  },
+  {
+    "id": "mateus",
+    "name": "Mateus",
+    "testament": "Novo Testamento",
+    "chapters": 28,
+    "theme": "O Rei prometido",
+    "icon": "👑",
+    "cover": "assets/covers/mateus.svg"
+  },
+  {
+    "id": "marcos",
+    "name": "Marcos",
+    "testament": "Novo Testamento",
+    "chapters": 16,
+    "theme": "O Servo poderoso",
+    "icon": "⚡",
+    "cover": "assets/covers/marcos.svg"
+  },
+  {
+    "id": "lucas",
+    "name": "Lucas",
+    "testament": "Novo Testamento",
+    "chapters": 24,
+    "theme": "O Salvador compassivo",
+    "icon": "🕊️",
+    "cover": "assets/covers/lucas.svg"
+  },
+  {
+    "id": "joao",
+    "name": "João",
+    "testament": "Novo Testamento",
+    "chapters": 21,
+    "theme": "O Verbo eterno",
+    "icon": "✨",
+    "cover": "assets/covers/joao.svg"
+  },
+  {
+    "id": "atos",
+    "name": "Atos",
+    "testament": "Novo Testamento",
+    "chapters": 28,
+    "theme": "Igreja em movimento",
+    "icon": "🔥",
+    "cover": "assets/covers/atos.svg"
+  },
+  {
+    "id": "romanos",
+    "name": "Romanos",
+    "testament": "Novo Testamento",
+    "chapters": 16,
+    "theme": "Justificação pela fé",
+    "icon": "✝️",
+    "cover": "assets/covers/romanos.svg"
+  },
+  {
+    "id": "1corintios",
+    "name": "1 Coríntios",
+    "testament": "Novo Testamento",
+    "chapters": 16,
+    "theme": "Igreja e maturidade",
+    "icon": "⛪",
+    "cover": "assets/covers/1corintios.svg"
+  },
+  {
+    "id": "2corintios",
+    "name": "2 Coríntios",
+    "testament": "Novo Testamento",
+    "chapters": 13,
+    "theme": "Consolo e ministério",
+    "icon": "🤲",
+    "cover": "assets/covers/2corintios.svg"
+  },
+  {
+    "id": "galatas",
+    "name": "Gálatas",
+    "testament": "Novo Testamento",
+    "chapters": 6,
+    "theme": "Liberdade em Cristo",
+    "icon": "🕊️",
+    "cover": "assets/covers/galatas.svg"
+  },
+  {
+    "id": "efesios",
+    "name": "Efésios",
+    "testament": "Novo Testamento",
+    "chapters": 6,
+    "theme": "Igreja e identidade",
+    "icon": "🛡️",
+    "cover": "assets/covers/efesios.svg"
+  },
+  {
+    "id": "filipenses",
+    "name": "Filipenses",
+    "testament": "Novo Testamento",
+    "chapters": 4,
+    "theme": "Alegria em Cristo",
+    "icon": "😊",
+    "cover": "assets/covers/filipenses.svg"
+  },
+  {
+    "id": "colossenses",
+    "name": "Colossenses",
+    "testament": "Novo Testamento",
+    "chapters": 4,
+    "theme": "Cristo supremo",
+    "icon": "👑",
+    "cover": "assets/covers/colossenses.svg"
+  },
+  {
+    "id": "1tessalonicenses",
+    "name": "1 Tessalonicenses",
+    "testament": "Novo Testamento",
+    "chapters": 5,
+    "theme": "Esperança",
+    "icon": "🌤️",
+    "cover": "assets/covers/1tessalonicenses.svg"
+  },
+  {
+    "id": "2tessalonicenses",
+    "name": "2 Tessalonicenses",
+    "testament": "Novo Testamento",
+    "chapters": 3,
+    "theme": "Perseverança",
+    "icon": "🕯️",
+    "cover": "assets/covers/2tessalonicenses.svg"
+  },
+  {
+    "id": "1timoteo",
+    "name": "1 Timóteo",
+    "testament": "Novo Testamento",
+    "chapters": 6,
+    "theme": "Liderança e doutrina",
+    "icon": "📘",
+    "cover": "assets/covers/1timoteo.svg"
+  },
+  {
+    "id": "2timoteo",
+    "name": "2 Timóteo",
+    "testament": "Novo Testamento",
+    "chapters": 4,
+    "theme": "Fidelidade final",
+    "icon": "🔥",
+    "cover": "assets/covers/2timoteo.svg"
+  },
+  {
+    "id": "tito",
+    "name": "Tito",
+    "testament": "Novo Testamento",
+    "chapters": 3,
+    "theme": "Boas obras",
+    "icon": "🛠️",
+    "cover": "assets/covers/tito.svg"
+  },
+  {
+    "id": "filemom",
+    "name": "Filemom",
+    "testament": "Novo Testamento",
+    "chapters": 1,
+    "theme": "Perdão",
+    "icon": "🤝",
+    "cover": "assets/covers/filemom.svg"
+  },
+  {
+    "id": "hebreus",
+    "name": "Hebreus",
+    "testament": "Novo Testamento",
+    "chapters": 13,
+    "theme": "Cristo superior",
+    "icon": "👑",
+    "cover": "assets/covers/hebreus.svg"
+  },
+  {
+    "id": "tiago",
+    "name": "Tiago",
+    "testament": "Novo Testamento",
+    "chapters": 5,
+    "theme": "Fé prática",
+    "icon": "🧭",
+    "cover": "assets/covers/tiago.svg"
+  },
+  {
+    "id": "1pedro",
+    "name": "1 Pedro",
+    "testament": "Novo Testamento",
+    "chapters": 5,
+    "theme": "Esperança no sofrimento",
+    "icon": "🪨",
+    "cover": "assets/covers/1pedro.svg"
+  },
+  {
+    "id": "2pedro",
+    "name": "2 Pedro",
+    "testament": "Novo Testamento",
+    "chapters": 3,
+    "theme": "Vigilância",
+    "icon": "🌟",
+    "cover": "assets/covers/2pedro.svg"
+  },
+  {
+    "id": "1joao",
+    "name": "1 João",
+    "testament": "Novo Testamento",
+    "chapters": 5,
+    "theme": "Amor e verdade",
+    "icon": "❤️",
+    "cover": "assets/covers/1joao.svg"
+  },
+  {
+    "id": "2joao",
+    "name": "2 João",
+    "testament": "Novo Testamento",
+    "chapters": 1,
+    "theme": "Verdade e amor",
+    "icon": "💌",
+    "cover": "assets/covers/2joao.svg"
+  },
+  {
+    "id": "3joao",
+    "name": "3 João",
+    "testament": "Novo Testamento",
+    "chapters": 1,
+    "theme": "Hospitalidade",
+    "icon": "🏠",
+    "cover": "assets/covers/3joao.svg"
+  },
+  {
+    "id": "judas",
+    "name": "Judas",
+    "testament": "Novo Testamento",
+    "chapters": 1,
+    "theme": "Defesa da fé",
+    "icon": "🛡️",
+    "cover": "assets/covers/judas.svg"
+  },
+  {
+    "id": "apocalipse",
+    "name": "Apocalipse",
+    "testament": "Novo Testamento",
+    "chapters": 22,
+    "theme": "Revelação de Cristo",
+    "icon": "🌌",
+    "cover": "assets/covers/apocalipse.svg"
+  }
+]

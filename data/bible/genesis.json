@@ -1,0 +1,39 @@
+{
+  "book": "Gênesis",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "A criação dos céus e da terra",
+      "verses": [
+        {"n":1,"t":"No princípio criou Deus os céus e a terra."},
+        {"n":2,"t":"A terra era sem forma e vazia; havia trevas sobre a face do abismo, e o Espírito de Deus se movia sobre a face das águas."},
+        {"n":3,"t":"E disse Deus: Haja luz; e houve luz."},
+        {"n":4,"t":"Viu Deus que a luz era boa, e fez separação entre a luz e as trevas."},
+        {"n":5,"t":"Deus chamou à luz Dia, e às trevas chamou Noite. Assim houve tarde e manhã: o primeiro dia."}
+      ],
+      "paragraphs": ["Resumo pastoral: Gênesis 1 ensina que Deus cria, ordena, separa e dá propósito. Onde havia vazio, a Palavra trouxe direção."]
+    },
+    {
+      "number": 3,
+      "title": "A queda do homem",
+      "verses": [
+        {"n":1,"t":"A serpente questionou a Palavra de Deus e lançou dúvida no coração humano."},
+        {"n":2,"t":"A mulher respondeu sobre o mandamento, mas a tentação apresentou desobediência como caminho de autonomia."},
+        {"n":3,"t":"O pecado trouxe vergonha, medo e afastamento da presença do Senhor."},
+        {"n":4,"t":"Mesmo após a queda, Deus procurou o homem e abriu caminho para esperança."}
+      ],
+      "paragraphs": ["Resumo pastoral: Gênesis 3 mostra que toda queda começa quando a Palavra de Deus deixa de governar o coração."]
+    },
+    {
+      "number": 12,
+      "title": "O chamado de Abraão",
+      "verses": [
+        {"n":1,"t":"O Senhor chamou Abraão para sair da sua terra e caminhar pela promessa."},
+        {"n":2,"t":"Deus prometeu fazer dele uma grande nação, abençoá-lo e engrandecer o seu nome."},
+        {"n":3,"t":"A promessa apontava para bênção que alcançaria famílias da terra."},
+        {"n":4,"t":"Abraão partiu como o Senhor lhe havia dito."}
+      ],
+      "paragraphs": ["Resumo pastoral: o chamado de Deus exige fé para sair antes de entender todos os detalhes do caminho."]
+    }
+  ]
+}
