@@ -33,6 +33,95 @@ async function loadJson(path, fallback){
   return await res.json();
 }
 
+
+
+// ===== Bíblia completa via GetBible API =====
+// Usa a tradução "almeida" disponível no GetBible. O texto não fica todo dentro do index;
+// cada capítulo é carregado quando a pessoa abre, e fica em cache no aparelho.
+const BIBLE_API = 'https://api.getbible.net/v2/almeida';
+const BIBLE_VERSION_LABEL = 'Almeida — GetBible';
+
+function getBookNumber(bookId){
+  const idx = DATA.books.findIndex(b => b.id === bookId);
+  return idx >= 0 ? idx + 1 : null;
+}
+
+function cacheKeyChapter(bookId, chapter){ return `chapter_${bookId}_${chapter}`; }
+function cacheKeyBook(bookId){ return `book_cache_${bookId}`; }
+
+function stripHtml(txt=''){
+  const div = document.createElement('div');
+  div.innerHTML = String(txt);
+  return (div.textContent || div.innerText || '').replace(/\s+/g,' ').trim();
+}
+
+function normalizeChapterResponse(raw){
+  let arr = null;
+  if(Array.isArray(raw)) arr = raw;
+  else if(Array.isArray(raw?.verses)) arr = raw.verses;
+  else if(Array.isArray(raw?.chapter?.verses)) arr = raw.chapter.verses;
+  else if(Array.isArray(raw?.data?.verses)) arr = raw.data.verses;
+  else if(raw?.verses && typeof raw.verses === 'object') arr = Object.values(raw.verses);
+
+  if(!arr) return [];
+  return arr.map((v, i) => {
+    if(typeof v === 'string') return { n: i + 1, t: stripHtml(v) };
+    return {
+      n: Number(v.verse || v.verse_nr || v.number || v.nr || v.v || i + 1),
+      t: stripHtml(v.text || v.verse_text || v.scripture || v.t || v.content || '')
+    };
+  }).filter(v => v.t);
+}
+
+async function fetchBibleChapter(bookId, chapter){
+  const cached = storage.get(cacheKeyChapter(bookId, chapter), null);
+  if(cached?.verses?.length) return cached;
+
+  const bookNumber = getBookNumber(bookId);
+  if(!bookNumber) throw new Error('Livro não encontrado.');
+
+  const url = `${BIBLE_API}/${bookNumber}/${chapter}.json`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Não foi possível carregar o capítulo da Bíblia agora.');
+  const raw = await res.json();
+  const verses = normalizeChapterResponse(raw);
+  if(!verses.length) throw new Error('O capítulo veio sem versículos reconhecidos.');
+
+  const payload = {
+    version: BIBLE_VERSION_LABEL,
+    source: url,
+    title: raw.name || raw.chapter_name || '',
+    verses,
+    savedAt: new Date().toISOString()
+  };
+  storage.set(cacheKeyChapter(bookId, chapter), payload);
+
+  let cachedChapters = storage.get(cacheKeyBook(bookId), []);
+  if(!cachedChapters.includes(chapter)){
+    cachedChapters.push(chapter);
+    cachedChapters.sort((a,b)=>a-b);
+    storage.set(cacheKeyBook(bookId), cachedChapters);
+  }
+
+  return payload;
+}
+
+async function downloadBookOffline(bookId){
+  const b = DATA.books.find(x=>x.id===bookId); if(!b) return;
+  toast(`Baixando ${b.name}...`);
+  const failed = [];
+  for(let ch=1; ch<=Number(b.chapters); ch++){
+    try { await fetchBibleChapter(bookId, ch); }
+    catch(e){ failed.push(ch); console.warn(e); }
+  }
+  if(failed.length){ toast(`Alguns capítulos falharam: ${failed.slice(0,5).join(', ')}${failed.length>5?'...':''}`); }
+  else { toast(`${b.name} completo salvo para leitura offline.`); }
+  openBook(bookId);
+}
+window.downloadBookOffline = downloadBookOffline;
+
+function cachedChapterList(bookId){ return storage.get(cacheKeyBook(bookId), []); }
+
 async function init(){
   main.innerHTML = '<div class="loader">Carregando Bíbliaflix...</div>';
   DATA.books = await loadJson('data/books.json', []);
@@ -163,25 +252,38 @@ window.setFilter = (key, value) => { state[key] = value; if(key==='bookFilter') 
 
 window.openBook = function(id){
   const b = DATA.books.find(x=>x.id===id); if(!b) return;
-  const available = DATA.bibleIndex[id]?.chapters || [];
-  const buttons = Array.from({length:b.chapters},(_,i)=>i+1).map(n => `<button class="chapterBtn ${available.includes(n)?'hasText':''}" onclick="openChapter('${id}',${n})">Cap. ${n}${available.includes(n)?' ✓':''}</button>`).join('');
-  main.innerHTML = `<section class="bookScreen"><aside class="sidePoster" style="background-image:url('${cover(b.cover)}')"></aside><div class="details"><span class="badge">${b.testament}</span><h1 class="detailTitle">${b.name}</h1><div class="infoPanel"><strong>Tema:</strong> ${esc(b.theme)}<br><strong>Capítulos:</strong> ${b.chapters}<br><strong>Status:</strong> ${available.length ? available.length + ' capítulo(s) com texto cadastrado nesta fase.' : 'estrutura pronta para receber texto.'}</div><div class="btnRow" style="margin-bottom:18px"><button class="pillBtn primary" onclick="openChapter('${id}',${available[0] || 1})">▶ Ler agora</button><button class="pillBtn" onclick="toggleFav('book','${id}')">⭐ Salvar livro</button><button class="pillBtn" onclick="go('books')">← Voltar aos livros</button></div><h2>Capítulos</h2><div class="chapters">${buttons}</div></div></section>`;
+  const cached = cachedChapterList(id);
+  const buttons = Array.from({length:b.chapters},(_,i)=>i+1).map(n => `<button class="chapterBtn ${cached.includes(n)?'hasText':''}" onclick="openChapter('${id}',${n})">Cap. ${n}${cached.includes(n)?' ✓':''}</button>`).join('');
+  main.innerHTML = `<section class="bookScreen"><aside class="sidePoster" style="background-image:url('${cover(b.cover)}')"></aside><div class="details"><span class="badge">${b.testament}</span><h1 class="detailTitle">${b.name}</h1><div class="infoPanel"><strong>Tema:</strong> ${esc(b.theme)}<br><strong>Capítulos:</strong> ${b.chapters}<br><strong>Texto bíblico:</strong> livro completo disponível capítulo por capítulo na versão ${BIBLE_VERSION_LABEL}.<br><strong>Offline:</strong> ${cached.length} capítulo(s) já salvo(s) neste aparelho.</div><div class="btnRow" style="margin-bottom:18px"><button class="pillBtn primary" onclick="openChapter('${id}',1)">▶ Ler do capítulo 1</button><button class="pillBtn" onclick="downloadBookOffline('${id}')">⬇ Baixar livro offline</button><button class="pillBtn" onclick="toggleFav('book','${id}')">⭐ Salvar livro</button><button class="pillBtn" onclick="go('books')">← Voltar aos livros</button></div><h2>Capítulos</h2><div class="chapters">${buttons}</div><p class="sourceNote">Ao abrir um capítulo pela primeira vez, o app busca o texto completo online e salva no aparelho. Depois de salvo, ele abre mais rápido.</p></div></section>`;
 };
 
 window.openChapter = async function(bookId, chapter){
   const b = DATA.books.find(x=>x.id===bookId); if(!b) return;
-  let data = null;
-  try { data = await loadJson(`data/bible/${bookId}.json`, null); } catch {}
-  const chapterData = data?.chapters?.find(c => Number(c.number) === Number(chapter));
-  if(!chapterData){
+  const cached = storage.get(cacheKeyChapter(bookId, chapter), null);
+  openReader({type:'chapter', id:`${bookId}-${chapter}`, title:`${b.name} ${chapter}`, sub: cached ? 'Abrindo capítulo salvo...' : 'Carregando texto bíblico completo...', cover:b.cover, badge:'Capítulo', paragraphs:['Aguarde um instante. O app está carregando o capítulo completo.']});
+  try {
+    const chapterData = await fetchBibleChapter(bookId, chapter);
     openReader({
-      type:'chapter', id:`${bookId}-${chapter}`, title:`${b.name} ${chapter}`, sub:'Capítulo ainda não cadastrado nesta fase', cover:b.cover,
-      badge:'Capítulo',
-      paragraphs:[`A estrutura de ${b.name} ${chapter} já está pronta. Nesta Fase 1, nem todos os 1.189 capítulos estão preenchidos ainda.`, 'O certo agora é ir alimentando a pasta data/bible/ com arquivos por livro, sem deixar o index gigante.']
+      type:'chapter',
+      id:`${bookId}-${chapter}`,
+      title:`${b.name} ${chapter}`,
+      sub:`${BIBLE_VERSION_LABEL} • ${chapterData.verses.length} versículo(s)`,
+      cover:b.cover,
+      badge:'Capítulo completo',
+      verses:chapterData.verses,
+      paragraphs:[`Fonte: ${BIBLE_VERSION_LABEL}. Capítulo carregado completo e salvo em cache neste aparelho.`],
+      progress:{type:'chapter',bookId,chapter,title:`${b.name} ${chapter}`,sub:`${BIBLE_VERSION_LABEL}`,cover:b.cover}
     });
-    return;
+  } catch (err) {
+    console.error(err);
+    openReader({
+      type:'chapter', id:`${bookId}-${chapter}`, title:`${b.name} ${chapter}`, sub:'Não foi possível carregar agora', cover:b.cover, badge:'Erro ao carregar',
+      paragraphs:[
+        'Não consegui carregar este capítulo completo agora. Verifique se o aparelho está com internet e se o site foi aberto pelo Vercel/GitHub Pages ou por servidor local.',
+        'Depois que o capítulo for carregado uma vez, ele fica salvo no aparelho para abrir mais rápido.'
+      ]
+    });
   }
-  openReader({type:'chapter',id:`${bookId}-${chapter}`,title:`${b.name} ${chapter}`,sub:chapterData.title || b.theme,cover:b.cover,badge:'Capítulo',verses:chapterData.verses,paragraphs:chapterData.paragraphs,progress:{type:'chapter',bookId,chapter,title:`${b.name} ${chapter}`,sub:chapterData.title || b.theme,cover:b.cover}});
 };
 
 window.openStory = function(id){
